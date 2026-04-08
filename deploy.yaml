@@ -1,0 +1,47 @@
+import:
+  - recipe/laravel.php
+ 
+config:
+  application: RalfiHarjutus
+  repository: git@github.com:K-Siim/RalfiHarjutus.git
+  branch: main
+  shared_files:
+    - .env
+  shared_dirs:
+    - storage
+  writable_dirs:
+    - bootstrap/cache
+    - storage
+    - storage/app
+    - storage/app/public
+    - storage/framework
+    - storage/logs
+  keep_releases: 3
+ 
+hosts:
+  stage:
+    hostname: virt137763.loopback.zonevs.eu
+    remote_user: virt137763
+    deploy_path: ~/domeenid/ta24siim.itmajakas.ee/ralfiharjutus
+ 
+tasks:
+  npm:production:
+    - run: 'cd {{release_path}} && npm ci && npm run build'
+ 
+  opcache:clear:
+    - run: killall php84-cgi || true
+ 
+  deploy:
+    - deploy:prepare
+    - deploy:vendors
+    - npm:production
+    - artisan:storage:link
+    - artisan:optimize:clear
+    # - artisan:migrate        # KOMMENTEERI VÄLJA ESIMESEL DEPLOYMISEL
+    # - artisan:optimize       # KOMMENTEERI VÄLJA ESIMESEL DEPLOYMISEL
+    - deploy:publish
+ 
+after:
+  deploy:success:
+    - opcache:clear
+ 
