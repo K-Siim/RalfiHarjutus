@@ -5,6 +5,9 @@ config:
   application: RalfiHarjutus
   repository: git@github.com:K-Siim/RalfiHarjutus.git
   branch: main
+  http_user: virt137763
+  http_group: virt137763
+  writable_mode: chmod
   shared_files:
     - .env
   shared_dirs:
