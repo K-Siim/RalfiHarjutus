@@ -1,6 +1,6 @@
 <script setup>
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const props = defineProps({
     markers: Array,
@@ -21,13 +21,11 @@ const form = useForm({
 });
 
 onMounted(async () => {
-    // Dynamically load Leaflet CSS
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
     document.head.appendChild(link);
 
-    // Dynamically load Leaflet JS
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
     script.onload = () => {
@@ -35,6 +33,17 @@ onMounted(async () => {
     };
     document.head.appendChild(script);
 });
+
+watch(() => props.markers, (newMarkers) => {
+    if (!map) return;
+    leafletMarkers.forEach(({ leafletMarker }) => {
+        map.removeLayer(leafletMarker);
+    });
+    leafletMarkers = [];
+    newMarkers.forEach(marker => {
+        addLeafletMarker(marker);
+    });
+}, { deep: true });
 
 function initMap() {
     map = L.map(mapContainer.value).setView([59.437, 24.7536], 7);
@@ -44,12 +53,10 @@ function initMap() {
         maxZoom: 19,
     }).addTo(map);
 
-    // Add existing markers
     props.markers.forEach(marker => {
         addLeafletMarker(marker);
     });
 
-    // Click on map to add new marker
     map.on('click', function (e) {
         form.latitude = parseFloat(e.latlng.lat.toFixed(7));
         form.longitude = parseFloat(e.latlng.lng.toFixed(7));
