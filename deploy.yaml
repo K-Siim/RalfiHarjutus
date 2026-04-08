@@ -20,9 +20,9 @@ config:
  
 hosts:
   stage:
-    hostname: virt137763.loopback.zonevs.eu
+    hostname: ta24siim.itmajakas.ee
     remote_user: virt137763
-    deploy_path: ~/domeenid/ta24siim.itmajakas.ee/ralfiharjutus
+    deploy_path: ~/domeenid/www.ta24siim.itmajakas.ee/ralfiharjutus
  
 tasks:
   npm:production:
